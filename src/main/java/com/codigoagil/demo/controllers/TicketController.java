@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,23 +49,36 @@ public class TicketController {
 
     @PostMapping
     public ResponseEntity<Ticket> crearTicket(@RequestBody Ticket ticket) {
-        Ticket nuevoTicket = ticketService.crearTicket(ticket);
-        return new ResponseEntity<>(nuevoTicket, HttpStatus.CREATED);
+        return new ResponseEntity<>(ticketService.crearTicket(ticket), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Ticket> actualizarTicket(@PathVariable Long id, @RequestBody Ticket ticket) {
+        return ResponseEntity.ok(ticketService.actualizarTicket(id, ticket));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Ticket> actualizarParcialTicket(@PathVariable Long id, @RequestBody Ticket ticket) {
+        return ResponseEntity.ok(ticketService.actualizarParcialTicket(id, ticket));
     }
 
     @PutMapping("/{id}/asignar")
     public ResponseEntity<Ticket> asignarAgente(@PathVariable Long id, @RequestParam Long agenteId) {
-        Ticket ticketActualizado = ticketService.asignarAgente(id, agenteId);
-        return ResponseEntity.ok(ticketActualizado);
+        return ResponseEntity.ok(ticketService.asignarAgente(id, agenteId));
     }
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<Ticket> cambiarEstado(@PathVariable Long id, @RequestParam Long estadoId) {
-        Ticket ticketActualizado = ticketService.cambiarEstado(id, estadoId);
-        return ResponseEntity.ok(ticketActualizado);
+        return ResponseEntity.ok(ticketService.cambiarEstado(id, estadoId));
     }
 
-    // --- ENDPOINTS DE COMENTARIOS ---
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarTicket(@PathVariable Long id) {
+        ticketService.eliminarTicket(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- ENDPOINTS DE COMENTARIOS ANIDADOS ---
 
     @GetMapping("/{id}/comentarios")
     public ResponseEntity<List<ComentarioTicket>> obtenerComentarios(@PathVariable Long id) {
@@ -71,16 +86,22 @@ public class TicketController {
     }
 
     @PostMapping("/{id}/comentarios")
-    public ResponseEntity<ComentarioTicket> agregarComentario(
-            @PathVariable Long id, 
-            @RequestBody ComentarioTicket comentario) {
-        
-        // Aseguramos que el comentario se asocie al ticket de la URL
+    public ResponseEntity<ComentarioTicket> agregarComentario(@PathVariable Long id, @RequestBody ComentarioTicket comentario) {
         Ticket ticketReferencia = new Ticket();
         ticketReferencia.setId(id);
         comentario.setTicket(ticketReferencia);
-        
-        ComentarioTicket nuevoComentario = comentarioService.agregarComentario(comentario);
-        return new ResponseEntity<>(nuevoComentario, HttpStatus.CREATED);
+        return new ResponseEntity<>(comentarioService.agregarComentario(comentario), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{ticketId}/comentarios/{comentarioId}")
+    public ResponseEntity<ComentarioTicket> editarComentario(@PathVariable Long ticketId, @PathVariable Long comentarioId, @RequestBody ComentarioTicket comentario) {
+        // En un caso real aquí verificaríamos que el comentario pertenezca al ticketId
+        return ResponseEntity.ok(comentarioService.actualizarComentario(comentarioId, comentario.getMensaje()));
+    }
+
+    @DeleteMapping("/{ticketId}/comentarios/{comentarioId}")
+    public ResponseEntity<Void> eliminarComentario(@PathVariable Long ticketId, @PathVariable Long comentarioId) {
+        comentarioService.eliminarComentario(comentarioId);
+        return ResponseEntity.noContent().build();
     }
 }

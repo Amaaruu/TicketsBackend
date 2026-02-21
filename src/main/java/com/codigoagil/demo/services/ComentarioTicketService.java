@@ -26,11 +26,26 @@ public class ComentarioTicketService {
 
     @Transactional
     public ComentarioTicket agregarComentario(ComentarioTicket comentario) {
-        // Validamos que el ticket exista antes de comentar
         Ticket ticket = ticketRepository.findById(comentario.getTicket().getId())
                 .orElseThrow(() -> new RuntimeException("Ticket no encontrado"));
-        
-        // Guardamos el comentario
         return comentarioRepository.save(comentario);
+    }
+
+    // PUT/PATCH: Normalmente un comentario solo actualiza su texto
+    @Transactional
+    public ComentarioTicket actualizarComentario(Long id, String nuevoMensaje) {
+        ComentarioTicket comentario = comentarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+        comentario.setMensaje(nuevoMensaje);
+        return comentarioRepository.save(comentario);
+    }
+
+    // DELETE: Borrar un comentario específico
+    @Transactional
+    public void eliminarComentario(Long id) {
+        if (!comentarioRepository.existsById(id)) {
+            throw new RuntimeException("Comentario no encontrado");
+        }
+        comentarioRepository.deleteById(id);
     }
 }
