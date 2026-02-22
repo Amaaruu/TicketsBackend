@@ -1,6 +1,7 @@
 package com.codigoagil.demo.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.codigoagil.demo.dtos.UsuarioResponseDTO;
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.services.UsuarioService;
 
@@ -26,39 +28,56 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    // Método utilitario privado para convertir Entidad -> DTO
+    private UsuarioResponseDTO convertirADTO(Usuario u) {
+        return new UsuarioResponseDTO(
+                u.getId(),
+                u.getNombre(),
+                u.getEmail(),
+                u.getRol().getNombre(),
+                u.getActivo()
+        );
+    }
+
     @GetMapping
-    public ResponseEntity<List<Usuario>> obtenerTodos() {
-        return ResponseEntity.ok(usuarioService.obtenerTodos());
+    public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodos() {
+        List<UsuarioResponseDTO> dtos = usuarioService.obtenerTodos().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.obtenerPorId(id));
+    public ResponseEntity<UsuarioResponseDTO> obtenerPorId(@PathVariable Long id) {
+        Usuario usuario = usuarioService.obtenerPorId(id);
+        return ResponseEntity.ok(convertirADTO(usuario));
     }
 
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
         try {
             Usuario nuevoUsuario = usuarioService.crearUsuario(usuario);
-            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+            return new ResponseEntity<>(convertirADTO(nuevoUsuario), HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return ResponseEntity.ok(usuarioService.actualizarUsuario(id, usuario));
+    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+        Usuario actualizado = usuarioService.actualizarUsuario(id, usuario);
+        return ResponseEntity.ok(convertirADTO(actualizado));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarParcialUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return ResponseEntity.ok(usuarioService.actualizarParcialUsuario(id, usuario));
+    public ResponseEntity<UsuarioResponseDTO> actualizarParcialUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+        Usuario actualizado = usuarioService.actualizarParcialUsuario(id, usuario);
+        return ResponseEntity.ok(convertirADTO(actualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.codigoagil.demo.exceptions.BadRequestException;
+import com.codigoagil.demo.exceptions.ResourceNotFoundException;
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.repositories.UsuarioRepository;
 
@@ -24,13 +26,13 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public Usuario obtenerPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
     }
 
     @Transactional
     public Usuario crearUsuario(Usuario usuario) {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("El correo electrónico ya está registrado.");
+            throw new BadRequestException("El correo electrónico ya está registrado.");
         }
         return usuarioRepository.save(usuario);
     }
