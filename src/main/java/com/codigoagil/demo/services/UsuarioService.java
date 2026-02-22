@@ -2,6 +2,7 @@ package com.codigoagil.demo.services;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder; // Inyectamos el encriptador
 
     @Transactional(readOnly = true)
     public List<Usuario> obtenerTodos() {
@@ -34,10 +36,14 @@ public class UsuarioService {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new BadRequestException("El correo electrónico ya está registrado.");
         }
+        
+        // Encriptamos la contraseña antes de guardarla en la base de datos
+        String hash = passwordEncoder.encode(usuario.getPasswordHash());
+        usuario.setPasswordHash(hash);
+        
         return usuarioRepository.save(usuario);
     }
 
-    // PUT: Actualiza todos los campos
     @Transactional
     public Usuario actualizarUsuario(Long id, Usuario usuarioDetalles) {
         Usuario usuario = obtenerPorId(id);
@@ -45,11 +51,9 @@ public class UsuarioService {
         usuario.setEmail(usuarioDetalles.getEmail());
         usuario.setRol(usuarioDetalles.getRol());
         usuario.setActivo(usuarioDetalles.getActivo());
-        // La contraseña se actualizaría en otro endpoint específico por seguridad
         return usuarioRepository.save(usuario);
     }
 
-    // PATCH: Actualiza solo los campos que se envían (no nulos)
     @Transactional
     public Usuario actualizarParcialUsuario(Long id, Usuario usuarioDetalles) {
         Usuario usuario = obtenerPorId(id);
@@ -62,7 +66,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    // DELETE Lógico: No borra de BD, solo desactiva
     @Transactional
     public void eliminarUsuario(Long id) {
         Usuario usuario = obtenerPorId(id);
