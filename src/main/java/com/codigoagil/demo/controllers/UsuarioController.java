@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class UsuarioController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')") // Solo ADMIN puede ver todos los usuarios
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodos() {
         List<UsuarioResponseDTO> dtos = usuarioService.obtenerTodos().stream()
@@ -53,6 +55,7 @@ public class UsuarioController {
         return ResponseEntity.ok(convertirADTO(usuario));
     }
 
+    
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
         try {
@@ -63,6 +66,7 @@ public class UsuarioController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')") 
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Usuario actualizado = usuarioService.actualizarUsuario(id, usuario);
@@ -75,6 +79,7 @@ public class UsuarioController {
         return ResponseEntity.ok(convertirADTO(actualizado));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')") 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);

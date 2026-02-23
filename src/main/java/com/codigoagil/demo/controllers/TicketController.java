@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -63,6 +64,7 @@ public class TicketController {
 
     // --- ENDPOINTS DE TICKETS ---
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'AGENTE')")
     @GetMapping
     public ResponseEntity<List<TicketResponseDTO>> obtenerTodos() {
         return ResponseEntity.ok(ticketService.obtenerTodos().stream()
@@ -95,16 +97,19 @@ public class TicketController {
         return ResponseEntity.ok(convertirTicketADTO(ticketService.actualizarParcialTicket(id, ticket)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'AGENTE')")
     @PutMapping("/{id}/asignar")
     public ResponseEntity<TicketResponseDTO> asignarAgente(@PathVariable Long id, @RequestParam Long agenteId) {
         return ResponseEntity.ok(convertirTicketADTO(ticketService.asignarAgente(id, agenteId)));
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'AGENTE')")
     @PutMapping("/{id}/estado")
     public ResponseEntity<TicketResponseDTO> cambiarEstado(@PathVariable Long id, @RequestParam Long estadoId) {
         return ResponseEntity.ok(convertirTicketADTO(ticketService.cambiarEstado(id, estadoId)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarTicket(@PathVariable Long id) {
         ticketService.eliminarTicket(id);
