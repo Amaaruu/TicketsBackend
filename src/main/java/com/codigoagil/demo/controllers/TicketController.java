@@ -109,7 +109,7 @@ public class TicketController {
         return ResponseEntity.ok(convertirTicketADTO(ticketService.cambiarEstado(id, estadoId)));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'AGENTE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarTicket(@PathVariable Long id) {
         ticketService.eliminarTicket(id);
