@@ -7,8 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codigoagil.demo.models.ComentarioTicket;
 import com.codigoagil.demo.models.Ticket;
+import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.repositories.ComentarioTicketRepository;
 import com.codigoagil.demo.repositories.TicketRepository;
+import com.codigoagil.demo.repositories.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ public class ComentarioTicketService {
 
     private final ComentarioTicketRepository comentarioRepository;
     private final TicketRepository ticketRepository;
+    private final UsuarioRepository usuarioRepository; // <-- AÑADIDO: Para buscar al usuario real
 
     @Transactional(readOnly = true)
     public List<ComentarioTicket> obtenerHistorialDeTicket(Long ticketId) {
@@ -26,8 +29,17 @@ public class ComentarioTicketService {
 
     @Transactional
     public ComentarioTicket agregarComentario(ComentarioTicket comentario) {
+        // 1. Buscamos el ticket real en la BD para asegurarnos de que exista
         Ticket ticket = ticketRepository.findById(comentario.getTicket().getId())
                 .orElseThrow(() -> new RuntimeException("Ticket no encontrado"));
+        comentario.setTicket(ticket);
+        
+        // 2. Buscamos al usuario real para que tenga su nombre y rol listos para el DTO
+        Usuario usuario = usuarioRepository.findById(comentario.getUsuario().getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        comentario.setUsuario(usuario);
+
+        // 3. Ahora sí, guardamos y retornamos el objeto completamente lleno
         return comentarioRepository.save(comentario);
     }
 
