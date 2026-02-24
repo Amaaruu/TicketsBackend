@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.codigoagil.demo.models.Categoria;
 import com.codigoagil.demo.models.Estado;
 import com.codigoagil.demo.models.Prioridad;
 import com.codigoagil.demo.models.Rol;
 import com.codigoagil.demo.models.Usuario;
+import com.codigoagil.demo.repositories.CategoriaRepository;
 import com.codigoagil.demo.repositories.EstadoRepository;
 import com.codigoagil.demo.repositories.PrioridadRepository;
 import com.codigoagil.demo.repositories.RolRepository;
@@ -22,8 +24,9 @@ public class DataSeeder {
             RolRepository rolRepo, 
             EstadoRepository estadoRepo, 
             PrioridadRepository prioridadRepo,
+            CategoriaRepository categoriaRepo, 
             UsuarioRepository usuarioRepo,
-            PasswordEncoder passwordEncoder // Usamos el encriptador aquí también
+            PasswordEncoder passwordEncoder
     ) {
         return args -> {
             // 1. Inicializar Roles
@@ -60,13 +63,27 @@ public class DataSeeder {
                 prioridadRepo.save(urgente);
             }
 
-            // 4. Inicializar Usuarios de Prueba (NUEVO)
+            // 4. Inicializar Categorías (CORREGIDO: Sin setDescripcion)
+            if (categoriaRepo.count() == 0) {
+                Categoria hardware = new Categoria(); hardware.setNombre("HARDWARE"); 
+                Categoria software = new Categoria(); software.setNombre("SOFTWARE"); 
+                Categoria redes = new Categoria(); redes.setNombre("REDES"); 
+                Categoria accesos = new Categoria(); accesos.setNombre("ACCESOS"); 
+                Categoria otros = new Categoria(); otros.setNombre("OTROS"); 
+                
+                categoriaRepo.save(hardware);
+                categoriaRepo.save(software);
+                categoriaRepo.save(redes);
+                categoriaRepo.save(accesos);
+                categoriaRepo.save(otros);
+            }
+
+            // 5. Inicializar Usuarios de Prueba
             if (usuarioRepo.count() == 0) {
                 Rol adminRol = rolRepo.findByNombre("ADMINISTRADOR").orElseThrow();
                 Rol agenteRol = rolRepo.findByNombre("AGENTE").orElseThrow();
                 Rol clienteRol = rolRepo.findByNombre("CLIENTE").orElseThrow();
 
-                // Todos tendrán la misma contraseña para que sea fácil probar: "password123"
                 String passwordEncriptada = passwordEncoder.encode("password123");
 
                 Usuario admin = new Usuario();
