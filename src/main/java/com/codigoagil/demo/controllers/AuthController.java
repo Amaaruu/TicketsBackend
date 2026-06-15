@@ -4,13 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import com.codigoagil.demo.dtos.AuthResponseDTO;
 import com.codigoagil.demo.dtos.LoginRequestDTO;
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.repositories.UsuarioRepository;
 import com.codigoagil.demo.security.JwtUtil;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,7 +36,6 @@ public class AuthController {
 
         String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().getNombre());
         
-        // AQUÍ ESTÁ EL CAMBIO: Pasamos usuario.getId() como segundo parámetro
         AuthResponseDTO response = new AuthResponseDTO(
                 token, 
                 usuario.getId(), 

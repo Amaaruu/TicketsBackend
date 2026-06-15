@@ -1,9 +1,7 @@
 package com.codigoagil.demo.models;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +23,6 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación: Muchos usuarios pueden tener el mismo Rol
     @ManyToOne(optional = false)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
@@ -42,7 +39,6 @@ public class Usuario {
     @Column(nullable = false)
     private Boolean activo = true;
 
-    // Hibernate llenará esta fecha automáticamente al crear el registro
     @CreationTimestamp
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;

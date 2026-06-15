@@ -2,24 +2,13 @@ package com.codigoagil.demo.controllers;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import com.codigoagil.demo.dtos.UsuarioResponseDTO;
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.services.UsuarioService;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +18,6 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    // Método utilitario privado para convertir Entidad -> DTO
     private UsuarioResponseDTO convertirADTO(Usuario u) {
         return new UsuarioResponseDTO(
                 u.getId(),
@@ -40,7 +28,7 @@ public class UsuarioController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") // Solo ADMIN puede ver todos los usuarios
+    @PreAuthorize("hasRole('ADMINISTRADOR')") 
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodos() {
         List<UsuarioResponseDTO> dtos = usuarioService.obtenerTodos().stream()
@@ -49,13 +37,14 @@ public class UsuarioController {
         return ResponseEntity.ok(dtos);
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')") 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> obtenerPorId(@PathVariable Long id) {
         Usuario usuario = usuarioService.obtenerPorId(id);
         return ResponseEntity.ok(convertirADTO(usuario));
     }
 
-    
+    @PreAuthorize("hasRole('ADMINISTRADOR')") 
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
         try {
@@ -73,6 +62,7 @@ public class UsuarioController {
         return ResponseEntity.ok(convertirADTO(actualizado));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')") 
     @PatchMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> actualizarParcialUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Usuario actualizado = usuarioService.actualizarParcialUsuario(id, usuario);

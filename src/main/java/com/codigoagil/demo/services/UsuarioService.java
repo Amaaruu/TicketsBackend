@@ -1,16 +1,13 @@
 package com.codigoagil.demo.services;
 
 import java.util.List;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.codigoagil.demo.exceptions.BadRequestException;
 import com.codigoagil.demo.exceptions.ResourceNotFoundException;
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.repositories.UsuarioRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder; // Inyectamos el encriptador
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public List<Usuario> obtenerTodos() {
@@ -37,7 +34,6 @@ public class UsuarioService {
             throw new BadRequestException("El correo electrónico ya está registrado.");
         }
         
-        // Encriptamos la contraseña antes de guardarla en la base de datos
         String hash = passwordEncoder.encode(usuario.getPasswordHash());
         usuario.setPasswordHash(hash);
         
