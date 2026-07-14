@@ -7,7 +7,6 @@ import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.mail.ImapMailReceiver;
-import org.springframework.integration.mail.MailReceiver;
 import org.springframework.integration.mail.MailReceivingMessageSource;
 import org.springframework.messaging.MessageChannel;
 
@@ -34,12 +33,12 @@ public class EmailIntegrationConfig {
 
     @Bean
     @InboundChannelAdapter(channel = "receiveEmailChannel", poller = @Poller(fixedDelay = "60000"))
-    public MailReceivingMessageSource mailMessageSource(MailReceiver mailReceiver) {
-        return new MailReceivingMessageSource(mailReceiver);
+    public MailReceivingMessageSource mailMessageSource(ImapMailReceiver imapMailReceiver) {
+        return new MailReceivingMessageSource(imapMailReceiver);
     }
 
     @Bean
-    public MailReceiver imapMailReceiver() {
+    public ImapMailReceiver imapMailReceiver() {
         String encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8);
         String storeUrl = "imaps://" + username + ":" + encodedPassword + "@" + host + ":993/inbox";
         
