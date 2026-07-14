@@ -9,12 +9,14 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.mail.ImapMailReceiver;
 import org.springframework.integration.mail.MailReceivingMessageSource;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.integration.config.EnableIntegration;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Configuration
+@EnableIntegration
 public class EmailIntegrationConfig {
 
     @Value("${spring.mail.host}")
