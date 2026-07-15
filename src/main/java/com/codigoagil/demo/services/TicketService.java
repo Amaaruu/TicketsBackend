@@ -1,6 +1,9 @@
 package com.codigoagil.demo.services;
 
+import com.codigoagil.demo.dtos.ArchivoAdjuntoResponseDTO;
 import com.codigoagil.demo.dtos.CorreoAdjuntoDTO;
+import com.codigoagil.demo.dtos.TicketResponseDTO;
+import com.codigoagil.demo.exceptions.ResourceNotFoundException;
 import com.codigoagil.demo.models.ArchivoAdjunto;
 import com.codigoagil.demo.models.Cliente;
 import com.codigoagil.demo.models.Ticket;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -64,5 +68,36 @@ public class TicketService {
         }
 
         return ticketGuardado;
+    }
+
+    @Transactional(readOnly = true)
+    public List<TicketResponseDTO> obtenerTodos() {
+        return ticketRepository.findAll().stream().map(this::mapearADTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public TicketResponseDTO obtenerPorId(Long id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado con id: " + id));
+        return mapearADTO(ticket);
+    }
+
+    private TicketResponseDTO mapearADTO(Ticket ticket) {
+        TicketResponseDTO dto = new TicketResponseDTO();
+        dto.setId(ticket.getId());
+        dto.setAsunto(ticket.getAsunto());
+        dto.setDescripcion(ticket.getDescripcion());
+        dto.setEstado(ticket.getEstado());
+        dto.setFechaCreacion(ticket.getFechaCreacion());
+        dto.setEmailCliente(ticket.getCliente().getEmail());
+        dto.setNombreCliente(ticket.getCliente().getNombre());
+
+        if (ticket.getArchivosAdjuntos() != null) {
+            List<ArchivoAdjuntoResponseDTO> adjuntosDTO = ticket.getArchivosAdjuntos().stream()
+                    .map(a -> new ArchivoAdjuntoResponseDTO(a.getId(), a.getNombreOriginal(), a.getTipoMime()))
+                    .collect(Collectors.toList());
+            dto.setAdjuntos(adjuntosDTO);
+        }
+        return dto;
     }
 }
