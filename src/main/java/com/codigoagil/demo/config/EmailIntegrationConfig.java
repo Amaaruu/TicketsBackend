@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.mail.ImapMailReceiver;
 import org.springframework.integration.mail.MailReceivingMessageSource;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.integration.config.EnableIntegration;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -41,8 +41,11 @@ public class EmailIntegrationConfig {
 
     @Bean
     public ImapMailReceiver imapMailReceiver() {
+        // Solución: Codificar tanto el usuario como la contraseña para proteger caracteres especiales como el '@'
+        String encodedUsername = URLEncoder.encode(username, StandardCharsets.UTF_8);
         String encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8);
-        String storeUrl = "imaps://" + username + ":" + encodedPassword + "@" + host + ":993/inbox";
+        
+        String storeUrl = "imaps://" + encodedUsername + ":" + encodedPassword + "@" + host + ":993/inbox";
         
         ImapMailReceiver receiver = new ImapMailReceiver(storeUrl);
         receiver.setShouldMarkMessagesAsRead(true);
