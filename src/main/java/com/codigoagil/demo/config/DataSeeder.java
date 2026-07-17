@@ -1,41 +1,45 @@
 package com.codigoagil.demo.config;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import com.codigoagil.demo.models.Rol;
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.repositories.RolRepository;
 import com.codigoagil.demo.repositories.UsuarioRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
 
 @Configuration
 public class DataSeeder {
 
     @Bean
-    CommandLineRunner initDatabase(
-            RolRepository rolRepo, 
-            UsuarioRepository usuarioRepo,
-            PasswordEncoder passwordEncoder
-    ) {
+    public CommandLineRunner initData(RolRepository rolRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (rolRepo.count() == 0) {
-                Rol admin = new Rol(); admin.setNombre("ADMINISTRADOR");
-                Rol usuario = new Rol(); usuario.setNombre("USUARIO");
-                rolRepo.save(admin);
-                rolRepo.save(usuario);
-            }
+            
+            Rol adminRole = rolRepository.findByNombre("ROLE_ADMIN").orElseGet(() -> {
+                Rol rol = new Rol();
+                rol.setNombre("ROLE_ADMIN");
+                return rolRepository.save(rol);
+            });
 
-            if (usuarioRepo.count() == 0) {
-                Rol adminRol = rolRepo.findByNombre("ADMINISTRADOR").orElseThrow();
-                String passwordEncriptada = passwordEncoder.encode("admin123");
+            rolRepository.findByNombre("ROLE_USER").orElseGet(() -> {
+                Rol rol = new Rol();
+                rol.setNombre("ROLE_USER");
+                return rolRepository.save(rol);
+            });
 
+            if (usuarioRepository.findByEmail("admin@demo.com").isEmpty()) {
                 Usuario admin = new Usuario();
-                admin.setNombre("Super Administrador");
-                admin.setEmail("admin@admin.com");
-                admin.setPasswordHash(passwordEncriptada);
-                admin.setRol(adminRol);
-                usuarioRepo.save(admin);
+                admin.setNombre("Administrador");
+                admin.setEmail("admin@demo.com");
+                admin.setPasswordHash(passwordEncoder.encode("1234"));
+                admin.setActivo(true);
+                admin.setCreadoEn(LocalDateTime.now());
+                admin.setRol(adminRole);
+
+                usuarioRepository.save(admin);
             }
         };
     }
