@@ -18,17 +18,19 @@ public class DataSeeder {
     public CommandLineRunner initData(RolRepository rolRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             
-            Rol adminRole = rolRepository.findByNombre("ROLE_ADMIN").orElseGet(() -> {
-                Rol rol = new Rol();
-                rol.setNombre("ROLE_ADMIN");
-                return rolRepository.save(rol);
-            });
+            Rol adminRole = rolRepository.findByNombre("ROLE_ADMIN").orElse(null);
+            if (adminRole == null) {
+                adminRole = new Rol();
+                adminRole.setNombre("ROLE_ADMIN");
+                adminRole = rolRepository.save(adminRole);
+            }
 
-            rolRepository.findByNombre("ROLE_USER").orElseGet(() -> {
-                Rol rol = new Rol();
-                rol.setNombre("ROLE_USER");
-                return rolRepository.save(rol);
-            });
+            Rol userRole = rolRepository.findByNombre("ROLE_USER").orElse(null);
+            if (userRole == null) {
+                userRole = new Rol();
+                userRole.setNombre("ROLE_USER");
+                rolRepository.save(userRole);
+            }
 
             if (usuarioRepository.findByEmail("admin@demo.com").isEmpty()) {
                 Usuario admin = new Usuario();
@@ -38,7 +40,7 @@ public class DataSeeder {
                 admin.setActivo(true);
                 admin.setCreadoEn(LocalDateTime.now());
                 admin.setRol(adminRole);
-
+                
                 usuarioRepository.save(admin);
             }
         };
