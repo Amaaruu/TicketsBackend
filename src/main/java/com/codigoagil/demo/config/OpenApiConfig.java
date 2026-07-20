@@ -1,7 +1,6 @@
 package com.codigoagil.demo.config;
 
 import org.springframework.context.annotation.Configuration;
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -20,7 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
             email = "tu.correo@ejemplo.com"
         )
     ),
-    security = @SecurityRequirement(name = "Bearer Authentication") // Le dice a Swagger que todos los endpoints requieren seguridad
+    security = @SecurityRequirement(name = "Bearer Authentication")
 )
 @SecurityScheme(
     name = "Bearer Authentication",

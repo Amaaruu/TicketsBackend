@@ -5,8 +5,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
 import com.codigoagil.demo.models.Usuario;
 import com.codigoagil.demo.repositories.UsuarioRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,7 +25,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return User.builder()
                 .username(usuario.getEmail())
                 .password(usuario.getPasswordHash())
-                .roles(usuario.getRol().getNombre()) 
+                // Usar authorities evita que Spring duplique el prefijo "ROLE_"
+                .authorities(usuario.getRol().getNombre()) 
                 .build();
     }
 }

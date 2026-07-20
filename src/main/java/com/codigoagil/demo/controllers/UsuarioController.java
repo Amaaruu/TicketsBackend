@@ -28,7 +28,7 @@ public class UsuarioController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodos() {
         List<UsuarioResponseDTO> dtos = usuarioService.obtenerTodos().stream()
@@ -37,14 +37,14 @@ public class UsuarioController {
         return ResponseEntity.ok(dtos);
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> obtenerPorId(@PathVariable Long id) {
         Usuario usuario = usuarioService.obtenerPorId(id);
         return ResponseEntity.ok(convertirADTO(usuario));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
         try {
@@ -55,21 +55,21 @@ public class UsuarioController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Usuario actualizado = usuarioService.actualizarUsuario(id, usuario);
         return ResponseEntity.ok(convertirADTO(actualizado));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> actualizarParcialUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Usuario actualizado = usuarioService.actualizarParcialUsuario(id, usuario);
         return ResponseEntity.ok(convertirADTO(actualizado));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')") 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
